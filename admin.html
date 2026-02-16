@@ -1,0 +1,417 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Admin Dashboard — NEXUS ACADEMY</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="styles.css" />
+    <style>
+      .dash {
+        padding: 24px 0 60px;
+      }
+      .panel {
+        background: rgba(255,255,255,0.06);
+        border: 1px solid rgba(255,255,255,0.12);
+        border-radius: 16px;
+        padding: 16px;
+        margin-bottom: 16px;
+      }
+      .panel h3 {
+        margin: 0 0 10px;
+        color: var(--gold);
+      }
+      .row {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 16px;
+      }
+      .row .panel { height: fit-content; }
+      .field { display: grid; gap: 8px; margin-bottom: 10px; }
+      .field input, .field select {
+        background: rgba(255,255,255,0.06);
+        border: 1px solid rgba(255,255,255,0.12);
+        border-radius: 12px;
+        color: var(--text);
+        padding: 10px 12px;
+        outline: none;
+      }
+      .list { list-style: none; padding: 0; margin: 0; }
+      .list li {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        padding: 10px 0;
+        border-bottom: 1px dashed rgba(255,255,255,0.1);
+      }
+      .list li:last-child { border-bottom: none; }
+      .muted { color: var(--muted); }
+      .note {
+        font-size: 12px;
+        color: var(--muted);
+        margin-top: 6px;
+      }
+      .sub-item {
+        display: block !important;
+        align-items: flex-start !important;
+      }
+      .sub-meta {
+        display: flex;
+        justify-content: space-between;
+        margin-bottom: 4px;
+        font-size: 0.85rem;
+      }
+      .sub-content {
+        background: rgba(255,255,255,0.05);
+        padding: 8px;
+        border-radius: 6px;
+        font-size: 0.9rem;
+        white-space: pre-wrap;
+      }
+      @media (max-width: 900px) {
+        .row { grid-template-columns: 1fr; }
+      }
+    </style>
+  </head>
+  <body>
+    <header class="topbar">
+      <div class="container topbar-inner">
+        <div class="logo">NEXUS ACADEMY</div>
+        <a class="btn btn-ghost" href="index.html">Home</a>
+      </div>
+    </header>
+    <main class="container dash">
+      <h2>Admin Dashboard</h2>
+      
+      <!-- Top Row: Students & Go Live -->
+      <div class="row">
+        <section class="panel">
+          <h3>👥 Enrolled Students</h3>
+          <div class="field">
+            <input id="studentName" type="text" placeholder="Student name" />
+          </div>
+          <div class="field">
+            <select id="studentSubject">
+              <option value="Mathematics">Mathematics</option>
+              <option value="Science">Science</option>
+              <option value="English">English</option>
+            </select>
+          </div>
+          <button class="btn btn-gold" id="addStudent">Add Student</button>
+          <ul class="list" id="studentsList" style="margin-top:12px"></ul>
+        </section>
+
+        <section class="panel">
+          <h3>🔴 Go Live Link</h3>
+          <div class="field">
+            <input id="liveLink" type="url" placeholder="Paste Google Meet/Zoom link" />
+          </div>
+          <div class="note">This link will open when students click "Go Live".</div>
+          <div style="margin-top:10px; display:flex; gap:10px;">
+            <button class="btn btn-gold" id="saveLive">Save Link</button>
+            <button class="btn btn-ghost" id="openLive">Test Link</button>
+          </div>
+        </section>
+      </div>
+
+      <!-- Middle Row: Homework & Notes Links -->
+      <div class="row">
+        <section class="panel">
+          <h3>📚 Manage Homework</h3>
+          <div class="field">
+            <input id="hwTitle" type="text" placeholder="Title (e.g. Algebra Ex 1.2)" />
+          </div>
+          <div class="field">
+            <input id="hwDetails" type="text" placeholder="Details (e.g. Q1 to Q10)" />
+          </div>
+          <button class="btn btn-gold" id="addHomework">Add Homework</button>
+          <ul class="list" id="homeworkList" style="margin-top:12px"></ul>
+        </section>
+
+        <section class="panel">
+          <h3>📑 Manage Notes (Links)</h3>
+          <div class="field">
+            <input id="noteTitle" type="text" placeholder="Title (e.g. Physics Chapter 1)" />
+          </div>
+          <div class="field">
+            <input id="noteLink" type="url" placeholder="URL (Google Drive / PDF Link)" />
+          </div>
+          <button class="btn btn-gold" id="addNote">Add Note Link</button>
+          <ul class="list" id="notesLinksList" style="margin-top:12px"></ul>
+        </section>
+      </div>
+
+      <!-- Inbox Section -->
+      <section class="panel">
+        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:10px;">
+          <h3 style="margin:0;">📩 Student Submissions & Replies</h3>
+          <button class="btn btn-ghost" id="refreshSubs" style="font-size:0.8rem;">Refresh</button>
+        </div>
+        <div class="note" style="margin-bottom:12px;">Answers and replies from students appear here.</div>
+        <ul class="list" id="submissionsList"></ul>
+      </section>
+
+      <!-- Bottom Row: Session PDF Uploads -->
+      <section class="panel">
+        <h3>📂 Upload Session PDFs</h3>
+        <input id="notesInput" type="file" accept="application/pdf" multiple />
+        <div class="note">These files are temporary for the current session.</div>
+        <ul class="list" id="notesList" style="margin-top:12px"></ul>
+      </section>
+    </main>
+
+    <script>
+      const adminKey = 'nexus_admin_auth';
+      const studentsKey = 'nexus_students';
+      const liveKey = 'nexus_live_link';
+      const homeworkKey = 'nexus_homework';
+      const notesKey = 'nexus_notes_links';
+      const submissionsKey = 'nexus_submissions';
+      
+      const studentsList = document.getElementById('studentsList');
+      const addStudentBtn = document.getElementById('addStudent');
+      const studentName = document.getElementById('studentName');
+      const studentSubject = document.getElementById('studentSubject');
+      
+      const liveLink = document.getElementById('liveLink');
+      const saveLive = document.getElementById('saveLive');
+      const openLive = document.getElementById('openLive');
+      
+      const notesInput = document.getElementById('notesInput');
+      const notesList = document.getElementById('notesList');
+      
+      const hwTitle = document.getElementById('hwTitle');
+      const hwDetails = document.getElementById('hwDetails');
+      const addHomework = document.getElementById('addHomework');
+      const homeworkList = document.getElementById('homeworkList');
+      
+      const noteTitle = document.getElementById('noteTitle');
+      const noteLink = document.getElementById('noteLink');
+      const addNote = document.getElementById('addNote');
+      const notesLinksList = document.getElementById('notesLinksList');
+
+      const submissionsList = document.getElementById('submissionsList');
+      const refreshSubs = document.getElementById('refreshSubs');
+
+      // Auth Check
+      if (localStorage.getItem(adminKey) !== 'true') {
+         window.location.href = 'teacher.html';
+      }
+
+      // Storage Helpers
+      function getList(key) {
+        try { return JSON.parse(localStorage.getItem(key) || '[]'); } catch { return []; }
+      }
+      function setList(key, arr) {
+        localStorage.setItem(key, JSON.stringify(arr));
+      }
+
+      // --- Students ---
+      function renderStudents() {
+        const arr = getList(studentsKey);
+        studentsList.innerHTML = '';
+        arr.forEach((s, idx) => {
+          const li = document.createElement('li');
+          li.innerHTML = `
+            <div>
+              <strong>${s.name}</strong>
+              <span class="muted">— ${s.subject}${s.phone ? ` • ${s.phone}` : ''}</span>
+            </div>
+            <button class="btn btn-ghost" onclick="removeStudent(${idx})">Remove</button>
+          `;
+          studentsList.appendChild(li);
+        });
+      }
+      window.removeStudent = (idx) => {
+        const arr = getList(studentsKey);
+        arr.splice(idx, 1);
+        setList(studentsKey, arr);
+        renderStudents();
+      };
+      addStudentBtn.addEventListener('click', () => {
+        const name = studentName.value.trim();
+        const subject = studentSubject.value;
+        if (!name) return;
+        const arr = getList(studentsKey);
+        arr.push({ name, subject, addedAt: Date.now() });
+        setList(studentsKey, arr);
+        studentName.value = '';
+        renderStudents();
+      });
+
+      // --- Go Live ---
+      liveLink.value = localStorage.getItem(liveKey) || '';
+      saveLive.addEventListener('click', () => {
+        const link = liveLink.value.trim();
+        if (!link) return;
+        localStorage.setItem(liveKey, link);
+        alert('Live link saved!');
+      });
+      openLive.addEventListener('click', () => {
+        const link = (localStorage.getItem(liveKey) || liveLink.value || '').trim();
+        if (!link) return;
+        window.open(link, '_blank');
+      });
+
+      // --- Homework ---
+      function renderHomework() {
+        const arr = getList(homeworkKey);
+        homeworkList.innerHTML = '';
+        arr.forEach((h, idx) => {
+          const li = document.createElement('li');
+          li.innerHTML = `
+            <div>
+              <strong>${h.title}</strong>
+              <span class="muted">— ${h.details}</span>
+            </div>
+            <button class="btn btn-ghost" onclick="removeHomework(${idx})">Remove</button>
+          `;
+          homeworkList.appendChild(li);
+        });
+      }
+      window.removeHomework = (idx) => {
+        const arr = getList(homeworkKey);
+        arr.splice(idx, 1);
+        setList(homeworkKey, arr);
+        renderHomework();
+      };
+      addHomework.addEventListener('click', () => {
+        const title = hwTitle.value.trim();
+        const details = hwDetails.value.trim();
+        if (!title) return;
+        const arr = getList(homeworkKey);
+        arr.unshift({ title, details, createdAt: Date.now() });
+        setList(homeworkKey, arr);
+        hwTitle.value = '';
+        hwDetails.value = '';
+        renderHomework();
+      });
+
+      // --- Notes Links ---
+      function renderNotesLinks() {
+        const arr = getList(notesKey);
+        notesLinksList.innerHTML = '';
+        arr.forEach((n, idx) => {
+          const li = document.createElement('li');
+          li.innerHTML = `
+            <div>
+              <strong>${n.title}</strong>
+              <span class="muted">— <a href="${n.link}" target="_blank" style="color:var(--gold)">Link</a></span>
+            </div>
+            <button class="btn btn-ghost" onclick="removeNote(${idx})">Remove</button>
+          `;
+          notesLinksList.appendChild(li);
+        });
+      }
+      window.removeNote = (idx) => {
+        const arr = getList(notesKey);
+        arr.splice(idx, 1);
+        setList(notesKey, arr);
+        renderNotesLinks();
+      };
+      addNote.addEventListener('click', () => {
+        const title = noteTitle.value.trim();
+        const link = noteLink.value.trim();
+        if (!title || !link) return;
+        const arr = getList(notesKey);
+        arr.unshift({ title, link, createdAt: Date.now() });
+        setList(notesKey, arr);
+        noteTitle.value = '';
+        noteLink.value = '';
+        renderNotesLinks();
+      });
+
+      // --- Submissions ---
+      function renderSubmissions() {
+        const arr = getList(submissionsKey);
+        submissionsList.innerHTML = '';
+        if (arr.length === 0) {
+          submissionsList.innerHTML = '<li class="muted">No submissions yet.</li>';
+          return;
+        }
+        arr.forEach((sub, idx) => {
+          const li = document.createElement('li');
+          li.className = 'sub-item';
+          const typeLabel = sub.type === 'homework' ? 'Homework Answer' : 'Note Reply';
+          
+          // Status badge
+          let statusBadge = '';
+          if (sub.status === 'approved') {
+            statusBadge = '<span class="badge badge-success" style="margin-left:8px;">✓ Approved</span>';
+          } else if (sub.status === 'rejected') {
+            statusBadge = '<span class="badge badge-error" style="margin-left:8px;">✗ Rejected</span>';
+          }
+          
+          li.innerHTML = `
+            <div class="sub-meta">
+              <span>
+                <strong style="color:var(--gold)">${sub.studentName}</strong> 
+                <span class="muted">(${sub.studentPhone})</span>
+                — ${typeLabel}: <strong>${sub.itemTitle}</strong>
+                ${statusBadge}
+              </span>
+              <span class="muted">${sub.timestamp}</span>
+            </div>
+            <div class="sub-content">${sub.content}</div>
+            <div style="text-align:right; margin-top:8px; display:flex; gap:6px; justify-content:flex-end;">
+              ${!sub.status || sub.status === 'pending' ? `
+                <button class="btn btn-success" style="font-size:0.75rem; padding:4px 8px;" onclick="approveSubmission(${idx})">✓ Approve</button>
+                <button class="btn btn-error" style="font-size:0.75rem; padding:4px 8px;" onclick="rejectSubmission(${idx})">✗ Reject</button>
+              ` : ''}
+               <button class="btn btn-ghost" style="font-size:0.75rem; padding:4px 8px;" onclick="removeSubmission(${idx})">Dismiss</button>
+            </div>
+          `;
+          submissionsList.appendChild(li);
+        });
+      }
+      
+      window.approveSubmission = (idx) => {
+        const arr = getList(submissionsKey);
+        arr[idx].status = 'approved';
+        arr[idx].reviewedAt = Date.now();
+        setList(submissionsKey, arr);
+        renderSubmissions();
+      };
+      
+      window.rejectSubmission = (idx) => {
+        const arr = getList(submissionsKey);
+        arr[idx].status = 'rejected';
+        arr[idx].reviewedAt = Date.now();
+        setList(submissionsKey, arr);
+        renderSubmissions();
+      };
+      window.removeSubmission = (idx) => {
+        const arr = getList(submissionsKey);
+        arr.splice(idx, 1);
+        setList(submissionsKey, arr);
+        renderSubmissions();
+      };
+      refreshSubs.addEventListener('click', renderSubmissions);
+
+      // --- PDF Uploads ---
+      notesInput.addEventListener('change', () => {
+        notesList.innerHTML = '';
+        Array.from(notesInput.files || []).forEach((f) => {
+          const url = URL.createObjectURL(f);
+          const li = document.createElement('li');
+          li.innerHTML = `
+            <div>
+              <strong>${f.name}</strong>
+              <span class="muted">— PDF</span>
+            </div>
+            <a class="btn btn-ghost" href="${url}" download="${f.name}">Download</a>
+          `;
+          notesList.appendChild(li);
+        });
+      });
+
+      // Init
+      renderStudents();
+      renderHomework();
+      renderNotesLinks();
+      renderSubmissions();
+    </script>
+  </body>
+</html>

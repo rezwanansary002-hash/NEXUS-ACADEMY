@@ -1,0 +1,511 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Student Portal — NEXUS ACADEMY</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="styles.css" />
+    <style>
+      .page {
+        min-height: 100vh;
+        padding: 24px 0 60px;
+        background: radial-gradient(60% 60% at 50% 50%, rgba(212,175,55,0.10), rgba(11,11,11,1));
+      }
+      .container { max-width: 1000px; margin: 0 auto; padding: 0 20px; }
+      
+      /* Grid Layout */
+      .grid-auth {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+        gap: 24px;
+        max-width: 800px;
+        margin: 40px auto;
+      }
+      .grid-dash {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+        gap: 24px;
+        margin-top: 24px;
+      }
+      
+      /* Cards */
+      .panel {
+        background: rgba(20, 20, 20, 0.6);
+        border: 1px solid rgba(212, 175, 55, 0.2);
+        backdrop-filter: blur(10px);
+        border-radius: 20px;
+        padding: 24px;
+        transition: transform 0.2s;
+      }
+      .panel:hover {
+        border-color: rgba(212, 175, 55, 0.4);
+      }
+      .panel h3 { 
+        margin: 0 0 16px; 
+        color: var(--gold);
+        font-size: 1.2rem;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+      }
+      
+      /* Form Fields */
+      .field { display: grid; gap: 8px; margin-bottom: 16px; }
+      .field label { font-size: 0.9rem; color: #ccc; }
+      .field input, .field select, .field textarea {
+        background: rgba(255,255,255,0.05);
+        border: 1px solid rgba(255,255,255,0.1);
+        border-radius: 12px;
+        color: white;
+        padding: 12px 16px;
+        outline: none;
+        font-family: inherit;
+        transition: border-color 0.2s;
+      }
+      .field input:focus, .field select:focus, .field textarea:focus {
+        border-color: var(--gold);
+      }
+      
+      /* Status & Utility */
+      .muted { color: #888; font-size: 0.9rem; }
+      .status { min-height: 24px; font-size: 0.9rem; margin-top: 10px; }
+      .hide { display: none !important; }
+      .flex-row { display: flex; align-items: center; gap: 12px; }
+      
+      /* Lists */
+      .list { list-style: none; padding: 0; margin: 0; }
+      .list li {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 12px 0;
+        border-bottom: 1px solid rgba(255,255,255,0.05);
+      }
+      .list li:last-child { border-bottom: none; }
+      .list-item-content { display: grid; gap: 4px; }
+      .badge {
+        font-size: 0.75rem;
+        padding: 4px 8px;
+        border-radius: 4px;
+        background: rgba(212, 175, 55, 0.2);
+        color: var(--gold);
+        width: fit-content;
+      }
+      
+      /* Header & Profile */
+      .welcome-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 24px;
+        flex-wrap: wrap;
+        gap: 16px;
+      }
+      .welcome-text h2 { margin: 0; font-size: 1.8rem; color: white; }
+      .welcome-text p { margin: 4px 0 0; color: #888; }
+      
+      /* Live Button Pulse */
+      .btn-pulse {
+        position: relative;
+        overflow: hidden;
+      }
+      .btn-pulse::after {
+        content: '';
+        position: absolute;
+        top: 0; left: 0; right: 0; bottom: 0;
+        background: rgba(255,255,255,0.1);
+        animation: pulse 2s infinite;
+      }
+      @keyframes pulse {
+        0% { transform: scale(0.95); opacity: 0.5; }
+        100% { transform: scale(1.5); opacity: 0; }
+      }
+
+      /* Modal */
+      .modal-overlay {
+        position: fixed;
+        top: 0; left: 0; right: 0; bottom: 0;
+        background: rgba(0,0,0,0.8);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        z-index: 1000;
+        padding: 20px;
+      }
+      .modal-box {
+        background: #111;
+        border: 1px solid var(--gold);
+        border-radius: 16px;
+        padding: 24px;
+        width: 100%;
+        max-width: 500px;
+      }
+    </style>
+  </head>
+  <body>
+    <header class="topbar">
+      <div class="container topbar-inner">
+        <div class="logo">NEXUS ACADEMY</div>
+        <a class="btn btn-ghost" href="index.html">Home</a>
+      </div>
+    </header>
+    
+    <main class="page">
+      <div class="container">
+        
+        <!-- Auth Section -->
+        <div id="authGrid" class="grid-auth">
+          <section class="panel">
+            <h3>🔐 Login</h3>
+            <div class="field">
+              <label>Student Name</label>
+              <input id="loginName" type="text" placeholder="Enter your name" />
+            </div>
+            <div class="field">
+              <label>WhatsApp Number</label>
+              <input id="loginPhone" type="tel" placeholder="e.g. 9101149119" />
+            </div>
+            <button class="btn btn-gold" id="loginBtn" style="width:100%">Login to Dashboard</button>
+            <div class="status" id="loginStatus" style="color: #ff6961"></div>
+          </section>
+
+          <section class="panel">
+            <h3>📝 New Registration</h3>
+            <div class="field">
+              <label>Full Name</label>
+              <input id="regName" type="text" placeholder="Enter your name" />
+            </div>
+            <div class="field">
+              <label>WhatsApp Number</label>
+              <input id="regPhone" type="tel" placeholder="e.g. 9101149119" />
+            </div>
+            <div class="field">
+              <label>Subject</label>
+              <select id="regSubject">
+                <option value="Mathematics">Mathematics</option>
+                <option value="Science">Science</option>
+                <option value="English">English</option>
+              </select>
+            </div>
+            <button class="btn btn-ghost" id="regBtn" style="width:100%">Register Now</button>
+            <div class="status" id="regStatus" style="color: var(--gold)"></div>
+          </section>
+        </div>
+
+        <!-- Dashboard Section -->
+        <div id="studentDash" class="hide">
+          <div class="welcome-header">
+            <div class="welcome-text">
+              <h2>Welcome, <span id="studentLabel" style="color:var(--gold)">Student</span></h2>
+              <p>Your learning journey continues here.</p>
+            </div>
+            <div class="flex-row">
+              <button class="btn btn-ghost" id="studentLogout">Logout</button>
+            </div>
+          </div>
+
+          <div class="grid-dash">
+            <!-- Live Class Card -->
+            <section class="panel" style="border-color: var(--gold);">
+              <h3>🔴 Live Class</h3>
+              <p class="muted" style="margin-bottom: 20px;">Join your scheduled live session now.</p>
+              <button class="btn btn-gold btn-pulse" id="studentGoLive" style="width:100%; padding: 16px;">
+                JOIN LIVE CLASS NOW
+              </button>
+              <div class="status" id="liveStatus" style="text-align:center; color:#ff6961;"></div>
+            </section>
+
+            <!-- Profile Card -->
+            <section class="panel">
+              <h3>👤 My Profile</h3>
+              <ul class="list">
+                <li>
+                  <span class="muted">Subject</span>
+                  <strong id="studentSubject">-</strong>
+                </li>
+                <li>
+                  <span class="muted">Phone</span>
+                  <strong id="studentPhone">-</strong>
+                </li>
+                <li>
+                  <span class="muted">Status</span>
+                  <span class="badge">Active Student</span>
+                </li>
+              </ul>
+            </section>
+
+            <!-- Homework Card -->
+            <section class="panel">
+              <h3>📚 Homework</h3>
+              <ul class="list" id="studentHomework">
+                <!-- Populated via JS -->
+              </ul>
+            </section>
+
+            <!-- Notes Card -->
+            <section class="panel">
+              <h3>📑 Study Notes</h3>
+              <ul class="list" id="studentNotes">
+                <!-- Populated via JS -->
+              </ul>
+            </section>
+          </div>
+        </div>
+
+      </div>
+    </main>
+
+    <!-- Submission Modal -->
+    <div id="submitModal" class="modal-overlay hide">
+      <div class="modal-box">
+        <h3 id="modalTitle" style="color:var(--gold); margin-top:0;">Submit Answer</h3>
+        <p id="modalSub" class="muted">Enter your reply or link below.</p>
+        <div class="field">
+          <textarea id="modalInput" rows="4" placeholder="Type your answer or paste a link here..."></textarea>
+        </div>
+        <div style="display:flex; gap:12px; justify-content:flex-end;">
+          <button class="btn btn-ghost" id="modalCancel">Cancel</button>
+          <button class="btn btn-gold" id="modalSend">Send to Teacher</button>
+        </div>
+      </div>
+    </div>
+
+    <script>
+      const studentsKey = 'nexus_students';
+      const liveKey = 'nexus_live_link';
+      const homeworkKey = 'nexus_homework';
+      const notesKey = 'nexus_notes_links';
+      const sessionKey = 'nexus_student_session';
+      const submissionsKey = 'nexus_submissions';
+
+      // Elements
+      const regName = document.getElementById('regName');
+      const regPhone = document.getElementById('regPhone');
+      const regSubject = document.getElementById('regSubject');
+      const regBtn = document.getElementById('regBtn');
+      const regStatus = document.getElementById('regStatus');
+
+      const loginName = document.getElementById('loginName');
+      const loginPhone = document.getElementById('loginPhone');
+      const loginBtn = document.getElementById('loginBtn');
+      const loginStatus = document.getElementById('loginStatus');
+
+      const authGrid = document.getElementById('authGrid');
+      const dash = document.getElementById('studentDash');
+      
+      const studentLabel = document.getElementById('studentLabel');
+      const studentSubject = document.getElementById('studentSubject');
+      const studentPhone = document.getElementById('studentPhone');
+      const studentHomework = document.getElementById('studentHomework');
+      const studentNotes = document.getElementById('studentNotes');
+      const studentGoLive = document.getElementById('studentGoLive');
+      const studentLogout = document.getElementById('studentLogout');
+      const liveStatus = document.getElementById('liveStatus');
+
+      // Modal Elements
+      const submitModal = document.getElementById('submitModal');
+      const modalTitle = document.getElementById('modalTitle');
+      const modalSub = document.getElementById('modalSub');
+      const modalInput = document.getElementById('modalInput');
+      const modalCancel = document.getElementById('modalCancel');
+      const modalSend = document.getElementById('modalSend');
+      
+      let currentItem = null; // { type: 'homework'|'note', title: string }
+
+      // Helpers
+      function getStudents() {
+        try { return JSON.parse(localStorage.getItem(studentsKey) || '[]'); } catch { return []; }
+      }
+      function setStudents(arr) {
+        localStorage.setItem(studentsKey, JSON.stringify(arr));
+      }
+      function getList(key) {
+        try { return JSON.parse(localStorage.getItem(key) || '[]'); } catch { return []; }
+      }
+      function setList(key, arr) {
+        localStorage.setItem(key, JSON.stringify(arr));
+      }
+      function normalizePhone(v) {
+        return v.replace(/\D/g, '');
+      }
+      function setSession(payload) {
+        localStorage.setItem(sessionKey, JSON.stringify(payload));
+      }
+      function getSession() {
+        try { return JSON.parse(localStorage.getItem(sessionKey) || 'null'); } catch { return null; }
+      }
+      function clearSession() {
+        localStorage.removeItem(sessionKey);
+      }
+
+      // UI Logic
+      function showDashboard(session) {
+        if (!session) return;
+        studentLabel.textContent = session.name;
+        studentSubject.textContent = session.subject || '-';
+        studentPhone.textContent = session.phone || '-';
+        
+        authGrid.classList.add('hide');
+        dash.classList.remove('hide');
+        
+        renderHomework();
+        renderNotes();
+      }
+
+      function hideDashboard() {
+        dash.classList.add('hide');
+        authGrid.classList.remove('hide');
+      }
+
+      function renderHomework() {
+        const arr = getList(homeworkKey);
+        studentHomework.innerHTML = '';
+        if (!arr.length) {
+          studentHomework.innerHTML = '<li class="muted">No pending homework.</li>';
+          return;
+        }
+        arr.forEach((h, idx) => {
+          const li = document.createElement('li');
+          li.innerHTML = `
+            <div class="list-item-content">
+              <strong>${h.title}</strong>
+              <span class="muted">${h.details || ''}</span>
+            </div>
+            <button class="btn btn-ghost" style="font-size:0.8rem" onclick="openSubmit('homework', '${h.title}')">Submit Answer</button>
+          `;
+          studentHomework.appendChild(li);
+        });
+      }
+
+      function renderNotes() {
+        const arr = getList(notesKey);
+        studentNotes.innerHTML = '';
+        if (!arr.length) {
+          studentNotes.innerHTML = '<li class="muted">No notes available.</li>';
+          return;
+        }
+        arr.forEach((n, idx) => {
+          const li = document.createElement('li');
+          li.innerHTML = `
+            <div class="list-item-content">
+              <strong>${n.title}</strong>
+            </div>
+            <div style="display:flex; gap:8px;">
+              <button class="btn btn-ghost" style="font-size:0.8rem" onclick="openSubmit('note', '${n.title}')">Reply</button>
+              <a class="btn btn-ghost" style="font-size: 0.8rem;" href="${n.link}" target="_blank">Open</a>
+            </div>
+          `;
+          studentNotes.appendChild(li);
+        });
+      }
+
+      // Submission Logic
+      window.openSubmit = (type, title) => {
+        currentItem = { type, title };
+        modalTitle.textContent = type === 'homework' ? 'Submit Homework' : 'Reply to Note';
+        modalSub.textContent = `For: ${title}`;
+        modalInput.value = '';
+        submitModal.classList.remove('hide');
+      };
+
+      modalCancel.addEventListener('click', () => {
+        submitModal.classList.add('hide');
+        currentItem = null;
+      });
+
+      modalSend.addEventListener('click', () => {
+        const content = modalInput.value.trim();
+        if (!content) return;
+        
+        const session = getSession();
+        if (!session) return;
+
+        const sub = {
+          id: Date.now(),
+          studentName: session.name,
+          studentPhone: session.phone,
+          type: currentItem.type,
+          itemTitle: currentItem.title,
+          content: content,
+          timestamp: new Date().toLocaleString(),
+          status: 'pending'
+        };
+
+        const submissions = getList(submissionsKey);
+        submissions.unshift(sub);
+        setList(submissionsKey, submissions);
+
+        alert('Sent successfully!');
+        submitModal.classList.add('hide');
+      });
+
+      // Events
+      regBtn.addEventListener('click', () => {
+        const name = regName.value.trim();
+        const phone = normalizePhone(regPhone.value.trim());
+        const subject = regSubject.value;
+        if (!name || !phone) {
+          regStatus.textContent = 'Enter name & WhatsApp number.';
+          return;
+        }
+        const arr = getStudents();
+        const exists = arr.find(s => s.name.toLowerCase() === name.toLowerCase() && normalizePhone(s.phone || '') === phone);
+        if (exists) {
+          regStatus.textContent = 'Already registered. Please login.';
+          return;
+        }
+        arr.push({ name, phone, subject, addedAt: Date.now() });
+        setStudents(arr);
+        regName.value = '';
+        regPhone.value = '';
+        regStatus.textContent = 'Success! Please login.';
+        setTimeout(() => regStatus.textContent = '', 3000);
+      });
+
+      loginBtn.addEventListener('click', () => {
+        const name = loginName.value.trim();
+        const phone = normalizePhone(loginPhone.value.trim());
+        if (!name || !phone) {
+          loginStatus.textContent = 'Enter name & WhatsApp number.';
+          return;
+        }
+        const arr = getStudents();
+        const match = arr.find(s => s.name.toLowerCase() === name.toLowerCase() && normalizePhone(s.phone || '') === phone);
+        if (!match) {
+          loginStatus.textContent = 'Not found. Please register.';
+          return;
+        }
+        const session = { name: match.name, phone: match.phone, subject: match.subject };
+        setSession(session);
+        loginStatus.textContent = '';
+        showDashboard(session);
+      });
+
+      studentGoLive.addEventListener('click', () => {
+        const link = (localStorage.getItem(liveKey) || '').trim();
+        if (!link) {
+          liveStatus.textContent = 'Class link is not active yet.';
+          setTimeout(() => liveStatus.textContent = '', 3000);
+          return;
+        }
+        liveStatus.textContent = 'Joining...';
+        window.open(link, '_blank');
+        setTimeout(() => liveStatus.textContent = '', 2000);
+      });
+
+      studentLogout.addEventListener('click', () => {
+        clearSession();
+        hideDashboard();
+        loginName.value = '';
+        loginPhone.value = '';
+      });
+
+      // Init
+      const session = getSession();
+      if (session) showDashboard(session);
+    </script>
+  </body>
+</html>

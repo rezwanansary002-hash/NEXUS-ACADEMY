@@ -1,0 +1,108 @@
+﻿<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>NEXUS ACADEMY - Premium Tutoring for Class 5-10</title>
+    <meta name="description" content="Master Maths, Science, & English with Personal Guidance. Premium tutoring for Class 5-10 with live classes and doubt support." />
+    <meta name="theme-color" content="#0B0B0B" />
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="styles.css" />
+  </head>
+  <body>
+    <header class="topbar">
+      <div class="container topbar-inner">
+        <div class="logo">NEXUS ACADEMY</div>
+        <div style="display:flex; gap:10px;">
+          <a class="btn btn-ghost" href="student.html">Student Portal</a>
+          <a class="btn btn-ghost" href="teacher.html">Teacher Login</a>
+        </div>
+      </div>
+    </header>
+
+    <main>
+      <section class="hero container">
+        <div class="hero-text">
+          <h1>Premium Tutoring for Class 5-10</h1>
+          <p>Master Maths, Science, & English with Personal Guidance.</p>
+          <div class="hero-sub">
+            <span>Live classes | Doubt support | Notes</span>
+          </div>
+        </div>
+        <div class="hero-visual">
+          <div class="glow"></div>
+          <div class="visual-card">
+            <span class="visual-emoji">N</span>
+          </div>
+        </div>
+      </section>
+
+      <section class="subjects container">
+        <div class="cards">
+          <article class="card" data-subject="Mathematics" data-price="800">
+            <div class="card-icon">📊</div>
+            <h3>Mathematics</h3>
+            <div class="price">₹800 / month</div>
+            <ul class="details">
+              <li>Algebra</li>
+              <li>Geometry</li>
+              <li>Arithmetic</li>
+            </ul>
+            <button class="btn btn-gold enroll-btn">ENROLL NOW</button>
+          </article>
+
+          <article class="card" data-subject="Science" data-price="840">
+            <div class="card-icon">⚛️</div>
+            <h3>Science</h3>
+            <div class="price">₹840 / month</div>
+            <ul class="details">
+              <li>Physics</li>
+              <li>Chemistry</li>
+              <li>Biology</li>
+            </ul>
+            <button class="btn btn-gold enroll-btn">ENROLL NOW</button>
+          </article>
+
+          <article class="card" data-subject="English" data-price="1000">
+            <div class="card-icon">📚</div>
+            <h3>English</h3>
+            <div class="price">₹1000 / month</div>
+            <ul class="details">
+              <li>Grammar</li>
+              <li>Literature</li>
+              <li>Spoken</li>
+            </ul>
+            <button class="btn btn-gold enroll-btn">ENROLL NOW</button>
+          </article>
+        </div>
+      </section>
+    </main>
+
+    <div id="payment-overlay" class="overlay hidden" aria-hidden="true">
+      <div class="modal">
+        <button class="close" aria-label="Close">✕</button>
+        <h2>Secure Your Seat</h2>
+        <p id="order-summary" class="order-summary"></p>
+        <div class="qr-wrap">
+          <img id="qr-img" alt="UPI QR Code" />
+        </div>
+        <div class="pay-details">
+          <p>Pay via UPI / GPay / PhonePe</p>
+          <p>Number: <strong>+91 9101149119</strong></p>
+        </div>
+        <div class="important">
+          <span>⚠️ IMPORTANT:</span>
+          <p>After payment, send a screenshot to WhatsApp: <strong>+91 9101149119</strong> to get your Class Link.</p>
+        </div>
+        <a id="wa-btn" class="btn btn-whatsapp" target="_blank" rel="noopener">Send Screenshot Now</a>
+      </div>
+    </div>
+
+    <script src="script.js"></script>
+  </body>
+  </html>
+
+
+

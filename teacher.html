@@ -1,0 +1,103 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Teacher Login — NEXUS ACADEMY</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="styles.css" />
+    <style>
+      .login-wrap {
+        min-height: 100vh;
+        display: grid;
+        place-items: center;
+        background: radial-gradient(60% 60% at 50% 50%, rgba(212,175,55,0.12), rgba(11,11,11,1));
+      }
+      .login-box {
+        width: 95%;
+        max-width: 420px;
+        background: #111;
+        border: 1px solid rgba(255,255,255,0.08);
+        border-radius: 18px;
+        box-shadow: 0 20px 60px rgba(0,0,0,0.6);
+        padding: 22px;
+        position: relative;
+      }
+      .login-box h2 {
+        margin: 0 0 8px;
+        color: var(--gold);
+      }
+      .field {
+        display: grid;
+        gap: 8px;
+        margin: 12px 0 16px;
+      }
+      .field input {
+        background: rgba(255,255,255,0.06);
+        border: 1px solid rgba(255,255,255,0.12);
+        border-radius: 12px;
+        color: var(--text);
+        padding: 12px 14px;
+        outline: none;
+      }
+      .error {
+        color: #ff6961;
+        min-height: 20px;
+      }
+      .shake {
+        animation: shake .35s ease;
+      }
+      @keyframes shake {
+        0%, 100% { transform: translateX(0); }
+        25% { transform: translateX(-6px); }
+        50% { transform: translateX(6px); }
+        75% { transform: translateX(-3px); }
+      }
+    </style>
+  </head>
+  <body>
+    <header class="topbar">
+      <div class="container topbar-inner">
+        <div class="logo">NEXUS ACADEMY</div>
+        <a class="btn btn-ghost" href="index.html">Home</a>
+      </div>
+    </header>
+    <main class="login-wrap">
+      <div class="login-box" id="loginBox">
+        <h2>Teacher Login</h2>
+        <p class="muted">Enter Admin Password</p>
+        <div class="field">
+          <input id="pwd" type="password" placeholder="Enter Admin Password" />
+        </div>
+        <div class="error" id="error"></div>
+        <button class="btn btn-gold" id="loginBtn">Login</button>
+      </div>
+    </main>
+    <script>
+      const PASSWORD = 'nexus@321';
+      const adminKey = 'nexus_admin_auth';
+      const loginBtn = document.getElementById('loginBtn');
+      const pwd = document.getElementById('pwd');
+      const errorEl = document.getElementById('error');
+      const box = document.getElementById('loginBox');
+      function tryLogin() {
+        const v = pwd.value.trim();
+        if (v === PASSWORD) {
+          localStorage.setItem(adminKey, 'true');
+          window.location.href = 'admin.html';
+        } else {
+          errorEl.textContent = 'Access Denied.';
+          box.classList.remove('shake');
+          void box.offsetWidth;
+          box.classList.add('shake');
+        }
+      }
+      loginBtn.addEventListener('click', tryLogin);
+      pwd.addEventListener('keydown', (e) => {
+        if (e.key === 'Enter') tryLogin();
+      });
+    </script>
+  </body>
+</html>
