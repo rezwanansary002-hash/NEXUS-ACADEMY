@@ -70,6 +70,13 @@
         font-size: 0.9rem;
         white-space: pre-wrap;
       }
+      .sub-photo {
+        display: block;
+        margin-top: 8px;
+        max-width: 260px;
+        border-radius: 8px;
+        border: 1px solid rgba(255,255,255,0.08);
+      }
       @media (max-width: 900px) {
         .row { grid-template-columns: 1fr; }
       }
@@ -103,14 +110,25 @@
           <ul class="list" id="studentsList" style="margin-top:12px"></ul>
         </section>
 
-        <section class="panel">
-          <h3>🔴 Go Live Link</h3>
+        <section class="panel" style="border-color: var(--gold);">
+          <h3>🔴 Live Classroom</h3>
+          <p class="muted" style="margin-bottom: 12px;">Start a "Vedantu-style" integrated live session with video, voice, and chat.</p>
+          <div class="field">
+            <input id="liveRoomName" type="text" placeholder="Room Name (e.g. Maths-Class-10)" value="Nexus-Live-Class" />
+          </div>
+          <div style="display:flex; gap:10px;">
+            <button class="btn btn-gold" id="startIntegratedLive" style="flex:1">START LIVE NOW</button>
+          </div>
+          <div class="note" style="margin-top:10px;">Students will see a "JOIN" button automatically.</div>
+          
+          <hr style="border:0; border-top:1px solid rgba(255,255,255,0.1); margin:16px 0;">
+          
+          <h3>🔗 Legacy Live Link</h3>
           <div class="field">
             <input id="liveLink" type="url" placeholder="Paste Google Meet/Zoom link" />
           </div>
-          <div class="note">This link will open when students click "Go Live".</div>
           <div style="margin-top:10px; display:flex; gap:10px;">
-            <button class="btn btn-gold" id="saveLive">Save Link</button>
+            <button class="btn btn-ghost" id="saveLive">Save Link</button>
             <button class="btn btn-ghost" id="openLive">Test Link</button>
           </div>
         </section>
@@ -176,6 +194,8 @@
       const studentSubject = document.getElementById('studentSubject');
       
       const liveLink = document.getElementById('liveLink');
+      const liveRoomName = document.getElementById('liveRoomName');
+      const startIntegratedLive = document.getElementById('startIntegratedLive');
       const saveLive = document.getElementById('saveLive');
       const openLive = document.getElementById('openLive');
       
@@ -241,18 +261,28 @@
         renderStudents();
       });
 
-      // --- Go Live ---
+      const integratedLiveKey = 'nexus_integrated_live';
+
+      // Load existing live link
       liveLink.value = localStorage.getItem(liveKey) || '';
+
       saveLive.addEventListener('click', () => {
-        const link = liveLink.value.trim();
-        if (!link) return;
-        localStorage.setItem(liveKey, link);
-        alert('Live link saved!');
+        const val = liveLink.value.trim();
+        localStorage.setItem(liveKey, val);
+        alert('Legacy Link Saved!');
       });
+
       openLive.addEventListener('click', () => {
-        const link = (localStorage.getItem(liveKey) || liveLink.value || '').trim();
-        if (!link) return;
-        window.open(link, '_blank');
+        const val = liveLink.value.trim();
+        if (val) window.open(val, '_blank');
+        else alert('No link saved.');
+      });
+
+      startIntegratedLive.addEventListener('click', () => {
+        const room = liveRoomName.value.trim() || 'Nexus-Live-Class';
+        localStorage.setItem(integratedLiveKey, room);
+        const url = `live.html?room=${encodeURIComponent(room)}&user=Teacher&role=teacher`;
+        window.open(url, '_blank');
       });
 
       // --- Homework ---
@@ -334,7 +364,13 @@
         arr.forEach((sub, idx) => {
           const li = document.createElement('li');
           li.className = 'sub-item';
-          const typeLabel = sub.type === 'homework' ? 'Homework Answer' : 'Note Reply';
+          let typeLabel = 'Message';
+          if (sub.type === 'homework') typeLabel = 'Homework Answer';
+          if (sub.type === 'note') typeLabel = 'Note Reply';
+          if (sub.type === 'chat') typeLabel = 'Direct Chat';
+          const itemTitle = sub.itemTitle ? `: <strong>${sub.itemTitle}</strong>` : '';
+          const contentText = (sub.content || '').trim() || (sub.photoDataUrl ? 'Photo attached.' : '');
+          const photoHtml = sub.photoDataUrl ? `<img class="sub-photo" src="${sub.photoDataUrl}" alt="${sub.photoName || 'Student photo'}" />` : '';
           
           // Status badge
           let statusBadge = '';
@@ -349,12 +385,13 @@
               <span>
                 <strong style="color:var(--gold)">${sub.studentName}</strong> 
                 <span class="muted">(${sub.studentPhone})</span>
-                — ${typeLabel}: <strong>${sub.itemTitle}</strong>
+                — ${typeLabel}${itemTitle}
                 ${statusBadge}
               </span>
               <span class="muted">${sub.timestamp}</span>
             </div>
-            <div class="sub-content">${sub.content}</div>
+            <div class="sub-content">${contentText}</div>
+            ${photoHtml}
             <div style="text-align:right; margin-top:8px; display:flex; gap:6px; justify-content:flex-end;">
               ${!sub.status || sub.status === 'pending' ? `
                 <button class="btn btn-success" style="font-size:0.75rem; padding:4px 8px;" onclick="approveSubmission(${idx})">✓ Approve</button>

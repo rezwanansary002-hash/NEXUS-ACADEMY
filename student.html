@@ -211,11 +211,16 @@
             <!-- Live Class Card -->
             <section class="panel" style="border-color: var(--gold);">
               <h3>🔴 Live Class</h3>
-              <p class="muted" style="margin-bottom: 20px;">Join your scheduled live session now.</p>
-              <button class="btn btn-gold btn-pulse" id="studentGoLive" style="width:100%; padding: 16px;">
-                JOIN LIVE CLASS NOW
-              </button>
-              <div class="status" id="liveStatus" style="text-align:center; color:#ff6961;"></div>
+              <p class="muted" style="margin-bottom: 20px;">Join your scheduled live session now with video, voice, and chat.</p>
+              <div style="display:grid; gap:10px;">
+                <button class="btn btn-gold btn-pulse" id="studentGoLiveIntegrated" style="width:100%; padding: 16px;">
+                  JOIN NEXUS LIVE (Integrated)
+                </button>
+                <button class="btn btn-ghost" id="studentGoLiveLegacy" style="width:100%;">
+                  Open Legacy Link (Meet/Zoom)
+                </button>
+              </div>
+              <div class="status" id="liveStatus" style="text-align:center; color:#ff6961; margin-top:10px;"></div>
             </section>
 
             <!-- Profile Card -->
@@ -251,6 +256,20 @@
               <ul class="list" id="studentNotes">
                 <!-- Populated via JS -->
               </ul>
+            </section>
+
+            <section class="panel">
+              <h3>💬 Direct Chat</h3>
+              <div class="field">
+                <label>Message</label>
+                <textarea id="chatMessage" rows="4" placeholder="Type your message to the teacher..."></textarea>
+              </div>
+              <div class="field">
+                <label>Send Photo</label>
+                <input id="chatPhoto" type="file" accept="image/*" />
+              </div>
+              <button class="btn btn-gold" id="chatSend" style="width:100%">Send to Teacher</button>
+              <div class="status" id="chatStatus" style="color: var(--gold)"></div>
             </section>
           </div>
         </div>
@@ -301,9 +320,14 @@
       const studentPhone = document.getElementById('studentPhone');
       const studentHomework = document.getElementById('studentHomework');
       const studentNotes = document.getElementById('studentNotes');
-      const studentGoLive = document.getElementById('studentGoLive');
+      const studentGoLiveIntegrated = document.getElementById('studentGoLiveIntegrated');
+      const studentGoLiveLegacy = document.getElementById('studentGoLiveLegacy');
       const studentLogout = document.getElementById('studentLogout');
       const liveStatus = document.getElementById('liveStatus');
+      const chatMessage = document.getElementById('chatMessage');
+      const chatPhoto = document.getElementById('chatPhoto');
+      const chatSend = document.getElementById('chatSend');
+      const chatStatus = document.getElementById('chatStatus');
 
       // Modal Elements
       const submitModal = document.getElementById('submitModal');
@@ -339,6 +363,14 @@
       }
       function clearSession() {
         localStorage.removeItem(sessionKey);
+      }
+      function readFileAsDataUrl(file) {
+        return new Promise((resolve, reject) => {
+          const reader = new FileReader();
+          reader.onload = () => resolve(reader.result || '');
+          reader.onerror = () => reject(new Error('File read failed'));
+          reader.readAsDataURL(file);
+        });
       }
 
       // UI Logic
@@ -442,6 +474,55 @@
         submitModal.classList.add('hide');
       });
 
+      chatSend.addEventListener('click', async () => {
+        const session = getSession();
+        if (!session) return;
+        const message = chatMessage.value.trim();
+        const file = (chatPhoto.files || [])[0];
+        if (!message && !file) {
+          chatStatus.textContent = 'Write a message or attach a photo.';
+          return;
+        }
+        if (file && !file.type.startsWith('image/')) {
+          chatStatus.textContent = 'Please select an image file.';
+          return;
+        }
+        if (file && file.size > 2 * 1024 * 1024) {
+          chatStatus.textContent = 'Photo must be under 2MB.';
+          return;
+        }
+        chatStatus.textContent = 'Sending...';
+        let photoDataUrl = '';
+        try {
+          if (file) photoDataUrl = await readFileAsDataUrl(file);
+        } catch {
+          chatStatus.textContent = 'Photo upload failed.';
+          return;
+        }
+
+        const sub = {
+          id: Date.now(),
+          studentName: session.name,
+          studentPhone: session.phone,
+          type: 'chat',
+          itemTitle: 'Direct Chat',
+          content: message,
+          photoDataUrl: photoDataUrl,
+          photoName: file ? file.name : '',
+          timestamp: new Date().toLocaleString(),
+          status: 'pending'
+        };
+
+        const submissions = getList(submissionsKey);
+        submissions.unshift(sub);
+        setList(submissionsKey, submissions);
+
+        chatMessage.value = '';
+        chatPhoto.value = '';
+        chatStatus.textContent = 'Sent successfully!';
+        setTimeout(() => chatStatus.textContent = '', 2500);
+      });
+
       // Events
       regBtn.addEventListener('click', () => {
         const name = regName.value.trim();
@@ -484,16 +565,34 @@
         showDashboard(session);
       });
 
-      studentGoLive.addEventListener('click', () => {
+      const integratedLiveKey = 'nexus_integrated_live';
+
+      // Live Join Handlers
+      studentGoLiveLegacy.addEventListener('click', () => {
         const link = (localStorage.getItem(liveKey) || '').trim();
-        if (!link) {
-          liveStatus.textContent = 'Class link is not active yet.';
+        if (link) {
+          liveStatus.textContent = 'Joining...';
+          window.open(link, '_blank');
+          setTimeout(() => liveStatus.textContent = '', 2000);
+        } else {
+          liveStatus.textContent = 'No legacy link available yet.';
           setTimeout(() => liveStatus.textContent = '', 3000);
-          return;
         }
-        liveStatus.textContent = 'Joining...';
-        window.open(link, '_blank');
-        setTimeout(() => liveStatus.textContent = '', 2000);
+      });
+
+      studentGoLiveIntegrated.addEventListener('click', () => {
+        const room = (localStorage.getItem(integratedLiveKey) || '').trim();
+        if (room) {
+          const session = getSession();
+          const user = session ? session.name : 'Student';
+          const url = `live.html?room=${encodeURIComponent(room)}&user=${encodeURIComponent(user)}&role=student`;
+          liveStatus.textContent = 'Joining...';
+          window.open(url, '_blank');
+          setTimeout(() => liveStatus.textContent = '', 2000);
+        } else {
+          liveStatus.textContent = 'Teacher hasn\'t started the integrated class yet.';
+          setTimeout(() => liveStatus.textContent = '', 3000);
+        }
       });
 
       studentLogout.addEventListener('click', () => {
